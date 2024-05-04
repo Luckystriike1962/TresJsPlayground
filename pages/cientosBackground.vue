@@ -5,7 +5,7 @@
         <TresGridHelper :args="[10, 10, 0x444444, 'teal']" />
         <TresMesh>
             <TresSphereGeometry ref="sphereRef"></TresSphereGeometry>
-            <TresMeshStandardMaterial :color="'red'" :env-map="envMap" />
+            <TresMeshStandardMaterial :color="'red'"  />
         </TresMesh>
         <TresDirectionalLight :position="[1, 1, 1]" />
         <TresAmbientLight :intensity="10" />
