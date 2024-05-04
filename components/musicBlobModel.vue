@@ -1,6 +1,6 @@
 <template>
-    <TresMesh>
-        <TresIcosahedronGeometry :args="[4, 80]" ref="blobRef"></TresIcosahedronGeometry>
+    <TresMesh ref="blobRef">
+        <TresIcosahedronGeometry :args="[4, 80]"></TresIcosahedronGeometry>
         <TresShaderMaterial wireframe :uniforms="uniforms" :fragment-shader="fragmentShader"
             :vertex-shader="vertexShader" />
     </TresMesh>
@@ -9,6 +9,8 @@
 
 <script lang="ts" setup>
 import * as THREE from 'three';
+
+
 const blobRef = shallowRef(null)
 
 const { onLoop } = useRenderLoop()
@@ -16,6 +18,8 @@ const { onLoop } = useRenderLoop()
 onLoop(({ elapsed }) => {
   if (blobRef.value) {
     uniforms.value.u_time.value = elapsed
+  
+    blobRef.value.rotation.x += 0.005
   }
 })
 
