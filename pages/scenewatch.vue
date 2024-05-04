@@ -29,7 +29,10 @@ let textures_skybox = [
 ];
 
 watch(canvasRef, (value) => {
-    if (!value.context?.scene) return;
+    if (!value.context?.scene) {
+        console.error("context or scene is null", value.context)
+        return;
+    }
 
     value.context.scene.value.background = new THREE.CubeTextureLoader().load(
         textures_skybox
