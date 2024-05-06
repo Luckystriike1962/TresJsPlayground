@@ -21,6 +21,7 @@ const analyser = shallowRef();
 
 //watchers
 watch(audioRef, (value) => {
+  console.log(analyser.value);
   analyser.value = new THREE.AudioAnalyser(audioRef.value?.sound, 32);
 })
 
@@ -28,6 +29,8 @@ watch(audioRef, (value) => {
 onLoop(({ elapsed }) => {
   if (blobRef.value) {
     uniforms.value.u_frequency.value = analyser.value ? analyser.value?.getAverageFrequency() : 0;
+    console.log(analyser.value?.getAverageFrequency());
+  
     uniforms.value.u_time.value = elapsed
     blobRef.value.rotation.x += 0.005
   }
