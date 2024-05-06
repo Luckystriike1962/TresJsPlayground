@@ -1,43 +1,44 @@
 <template>
-    <TresMesh ref="blobRef">
-        <TresIcosahedronGeometry :args="[4, 80]"></TresIcosahedronGeometry>
-        <TresShaderMaterial wireframe :uniforms="uniforms" :fragment-shader="fragmentShader"
-            :vertex-shader="vertexShader" />
-    </TresMesh>
+  <TresMesh ref="blobRef">
+    <TresIcosahedronGeometry :args="[4, 80]"></TresIcosahedronGeometry>
+    <TresShaderMaterial wireframe :uniforms="uniforms" :fragment-shader="fragmentShader"
+      :vertex-shader="vertexShader" />
+  </TresMesh>
 
 </template>
 
 <script lang="ts" setup>
+import { GlobalAudio } from '@tresjs/cientos';
 import * as THREE from 'three';
 
-
-const blobRef = shallowRef(null)
-const audioRef = defineModel();
-
+// composables
 const { onLoop } = useRenderLoop()
-const analyser =  shallowRef(null);
 
-watch(audioRef, (value) =>{
-  if(audioRef)
-    analyser.value =  new THREE.AudioAnalyser(audioRef.value.sound, 32)
+// refs
+const blobRef = shallowRef<any>(null)
+const audioRef = defineModel<typeof GlobalAudio | null>();
+const analyser = shallowRef();
+
+//watchers
+watch(audioRef, (value) => {
+  analyser.value = new THREE.AudioAnalyser(audioRef.value?.sound, 32);
 })
 
+// animation loop
 onLoop(({ elapsed }) => {
   if (blobRef.value) {
-    
-    if(audioRef.value && audioRef.value?.sound){
-      console.log(analyser.value);
-    }
-
+    uniforms.value.u_frequency.value = analyser.value ? analyser.value?.getAverageFrequency() : 0;
     uniforms.value.u_time.value = elapsed
     blobRef.value.rotation.x += 0.005
   }
 })
 
-// ...
+// shader
+// set props to pass into the shader
 const uniforms = ref({
-    u_resolution: { type: 'V2', value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-    u_time: { type: 'f', value: 0.0 }
+  u_resolution: { type: 'V2', value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+  u_time: { type: 'f', value: 0.0 },
+  u_frequency: { type: 'f', value: 0.0 }
 });
 
 const vertexShader = ref(`
@@ -136,9 +137,11 @@ float pnoise(vec3 P, vec3 rep)
   return 2.2 * n_xyz;
 }
 
+uniform float u_frequency;
+
  void main() {
     float noise = 5.0 * pnoise(position + u_time, vec3(10.0));
-    float displacement = noise / 10.0;
+    float displacement = (u_frequency / 30.0) * (noise / 10.0);
     vec3 newPosition = position + normal * displacement;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
  }
@@ -148,7 +151,7 @@ const fragmentShader = ref(`
     uniform vec2 u_resolution;
 
     void main() {
-        vec2 st = gl_FragCoord.xy / u_resolution;
+        vec2 st = gl_FragCoord.xy / (u_resolution - 1000.0);
 
         gl_FragColor = vec4(vec3(st.x, st.y, 1.0), 1.0);
     }
