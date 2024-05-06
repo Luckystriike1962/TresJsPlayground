@@ -12,7 +12,7 @@ import { GlobalAudio } from '@tresjs/cientos';
 import * as THREE from 'three';
 
 // composables
-const { onLoop } = useRenderLoop()
+const { onLoop, resume } = useRenderLoop()
 
 // refs
 const blobRef = shallowRef<any>(null)
@@ -21,23 +21,20 @@ const analyser = shallowRef();
 
 //watchers
 watch(audioRef, (value) => {
-  console.log(analyser.value);
- 
   analyser.value = new THREE.AudioAnalyser(audioRef.value?.sound, 32);
-   console.log(analyser.value);
 })
 
 // animation loop
 onLoop(({ elapsed }) => {
   if (blobRef.value) {
     uniforms.value.u_frequency.value = analyser.value ? analyser.value?.getAverageFrequency() : 0;
-    console.log(analyser.value?.getAverageFrequency());
   
     uniforms.value.u_time.value = elapsed
     blobRef.value.rotation.x += 0.005
   }
 })
 
+resume();
 // shader
 // set props to pass into the shader
 const uniforms = ref({
