@@ -22,7 +22,9 @@ const analyser = shallowRef();
 //watchers
 watch(audioRef, (value) => {
   console.log(analyser.value);
+ 
   analyser.value = new THREE.AudioAnalyser(audioRef.value?.sound, 32);
+   console.log(analyser.value);
 })
 
 // animation loop
