@@ -6,7 +6,7 @@
         <GlobalAudio :src="exampleAudio" ref="audioRef"/>
             <TresGridHelper :args="[10, 10, 0x444444, 'teal']" />
             <Suspense>
-                <MusicBlobModel :v-model="audioRef.value"/>
+                <MusicBlobModel v-model="audioRef"/>
             </Suspense>
             <TresDirectionalLight :position="[1, 1, 1]" />
             <TresAmbientLight :intensity="1" />
@@ -14,10 +14,11 @@
 </template>
 
 <script lang="ts" setup>
+import { GlobalAudio } from "@tresjs/cientos";
 import type { ShallowRef } from "vue";
 
 const sphereRef: ShallowRef<TresInstance | null> = shallowRef(null)
-const audioRef: ShallowRef<TresInstance | null> = shallowRef(null)
+const audioRef = ref(null)
 const exampleAudio = ref("/Beats.mp3");
 
 </script>

@@ -12,13 +12,24 @@ import * as THREE from 'three';
 
 
 const blobRef = shallowRef(null)
+const audioRef = defineModel();
 
 const { onLoop } = useRenderLoop()
+const analyser =  shallowRef(null);
+
+watch(audioRef, (value) =>{
+  if(audioRef)
+    analyser.value =  new THREE.AudioAnalyser(audioRef.value.sound, 32)
+})
 
 onLoop(({ elapsed }) => {
   if (blobRef.value) {
+    
+    if(audioRef.value && audioRef.value?.sound){
+      console.log(analyser.value);
+    }
+
     uniforms.value.u_time.value = elapsed
-  
     blobRef.value.rotation.x += 0.005
   }
 })
